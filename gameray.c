@@ -53,14 +53,16 @@ int main(void)
 	game_res.map.thickness = (float *)malloc(10*sizeof(float));
 	game_res.level = LEVEL_1;
 	game_res.snake.snake_len = 4;
+	game_res.coin.block_center = (Vector2){700, 400};
 	set_map(&game_res);
 	set_snake_intial_position(&game_res);
-	
+
 	int pixel_index;
 	bool keypressed = false;
-	int update_speed=60;
+	int update_frame=30;
 	int inital_count = 0;
-	bool collision;
+	bool collision=false;
+	bool collision_coin = false;
 
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, TITLE);
 	SetTargetFPS(60); 
@@ -81,7 +83,12 @@ int main(void)
 	    	if(game_res.is_map_loaded == MAP_NOT_LOADED){game_res.is_map_loaded = MAP_LOADED;}	    	
 	    	if(game_res.is_map_loaded == MAP_LOADED_AND_SAVED){
 	    		make_snake(&game_res, 0, RED);
-	    		if(inital_count%60 ==0)
+	    		make_coin(&game_res, collision_coin);
+	    		if(collision_coin == true){
+	    			collision_coin = false;
+	    		}
+
+	    		if(inital_count%update_frame ==0)
 	    		{
 	    			make_snake(&game_res, 40, RED);
 	    			snake_start_pos_x += 40;
@@ -121,7 +128,9 @@ int main(void)
 	    	game_res.is_map_loaded = MAP_LOADED_AND_SAVED;
 	    }
 	    if(game_res.is_map_loaded == MAP_LOADED_AND_SAVED)
-	    {
+	    {	
+
+	    	collision_coin = CheckCollisionRecs((Rectangle){game_res.snake.snake_block[0].start_pos.x, game_res.snake.snake_block[0].start_pos.y, 30, 30},(Rectangle){game_res.coin.block_center.x, game_res.coin.block_center.y, 30, 30});
 	    	collision = check_collision(&game_res);
 	    	if(collision == true){
 	    		set_snake_intial_position(&game_res);

@@ -4,6 +4,7 @@
 #include "gameutils.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 key_press_q_t *key_q_head = NULL, *key_q_tail = NULL;
 
 void make_keypress_node(KeyboardKey key, game_resource *game_res)
@@ -356,4 +357,15 @@ bool check_collision(game_resource *game_res)
 		return true;
 	}
 	return false;
+}
+
+void make_coin(game_resource *game_res, bool collision){
+	if(collision == true){
+		SetRandomSeed(time(NULL));
+		game_res->coin.block_center.x = GetRandomValue(100, SCREENWIDTH - 100);
+		game_res->coin.block_center.y = GetRandomValue(100, SCREENHEIGHT - 100);
+	}
+	
+	DrawLineEx((Vector2){game_res->coin.block_center.x-15, game_res->coin.block_center.y},(Vector2){game_res->coin.block_center.x+15, game_res->coin.block_center.y}, 30, VIOLET);
+
 }

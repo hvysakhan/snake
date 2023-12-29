@@ -59,11 +59,17 @@ typedef  struct {
 	float *thickness;
 }map;
 
+typedef struct{
+	Vector2 block_center;
+	Color color;
+}coin;
+
 typedef struct {
 	game_level level;
 	is_map_loaded is_map_loaded;
 	snake snake;
 	map map;
+	coin coin;
 	Image image_map;
 	Color *image_map_colors;
 }game_resource;
@@ -78,5 +84,6 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res);
 void traverse_keypress(void);
 void delete_all_keypress_node(void);
 bool check_collision(game_resource *game_res);
+void make_coin(game_resource *game_res, bool collision);
 
 #endif
