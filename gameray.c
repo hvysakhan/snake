@@ -41,10 +41,7 @@ int main(void)
     line_end_pos.y = SCREENHEIGHT;
 
 
-	InitWindow(SCREENWIDTH, SCREENHEIGHT, TITLE);
-
-	SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-	//--------------------------------------------------------------------------------------
+              
 	int rotation = 0;
 	bool drawtext = true;
 	float snake_start_pos_x = 300;
@@ -63,6 +60,10 @@ int main(void)
 	bool keypressed = false;
 	int update_speed=60;
 	int inital_count = 0;
+	bool collision;
+
+	InitWindow(SCREENWIDTH, SCREENHEIGHT, TITLE);
+	SetTargetFPS(60); 
 	while (!WindowShouldClose())    // Detect window close button or ESC key
 	{
 		// Update
@@ -88,7 +89,7 @@ int main(void)
 	    		}
 	    		if(IsKeyPressed(KEY_UP))
 	    		{
-	    			printf("UP Key Pressed\n");
+	    			printf("Up Key Pressed\n");
 	    			make_keypress_node(KEY_UP, &game_res);
 	    			traverse_keypress();
 	    		}else if(IsKeyPressed(KEY_DOWN))
@@ -121,25 +122,12 @@ int main(void)
 	    }
 	    if(game_res.is_map_loaded == MAP_LOADED_AND_SAVED)
 	    {
-	    	if((game_res.snake.snake_block[0].block_direction == BLOCK_LEFT) || (game_res.snake.snake_block[0].block_direction == BLOCK_RIGHT)){
-	    		pixel_index = (game_res.image_map.width*game_res.snake.snake_block[0].start_pos.y) + game_res.snake.snake_block[0].start_pos.x;
-	    		if(game_res.image_map_colors[pixel_index].r!=BLACK.r && game_res.image_map_colors[pixel_index].g!=BLACK.g || game_res.image_map_colors[pixel_index].b!=BLACK.b){
-	    			printf("Index is:%d\t%u\t%u\t%u\n", pixel_index,game_res.image_map_colors[pixel_index].r, game_res.image_map_colors[pixel_index].g, game_res.image_map_colors[pixel_index].b);
-	    			set_snake_intial_position(&game_res);
-	    			delete_all_keypress_node();
-
-	    		}
-	    	}else{
-	    		pixel_index = (game_res.image_map.width*game_res.snake.snake_block[0].start_pos.y) + game_res.snake.snake_block[0].start_pos.x;
-	    		if(game_res.image_map_colors[pixel_index].r!=BLACK.r && game_res.image_map_colors[pixel_index].g!=BLACK.g || game_res.image_map_colors[pixel_index].b!=BLACK.b){
-	    			printf("Index is:%d\t%u\t%u\t%u\n", pixel_index,game_res.image_map_colors[pixel_index].r, game_res.image_map_colors[pixel_index].g, game_res.image_map_colors[pixel_index].b);
-	    			set_snake_intial_position(&game_res);
-	    			delete_all_keypress_node();
-
-	    		}
+	    	collision = check_collision(&game_res);
+	    	if(collision == true){
+	    		set_snake_intial_position(&game_res);
+	    		delete_all_keypress_node();
 	    	}
 	    	
-
 	  	}
     	
 
@@ -148,7 +136,7 @@ int main(void)
 	}
 
 
-
+	//free used memory
 	delete_all_keypress_node();
 	UnloadImage(game_res.image_map);
 	UnloadImageColors(game_res.image_map_colors);

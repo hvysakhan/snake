@@ -77,5 +77,6 @@ void make_block_line(Vector2 start_pos, Vector2 end_pos, int block_length, int b
 void make_keypress_node(KeyboardKey key, game_resource *game_res);
 void traverse_keypress(void);
 void delete_all_keypress_node(void);
+bool check_collision(game_resource *game_res);
 
 #endif

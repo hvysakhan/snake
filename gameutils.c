@@ -346,3 +346,14 @@ void make_snake(game_resource *gr, int velocity, Color color)
 		DrawLineEx(temp_vec_start, temp_vec_end, 30, color);
 	}
 }
+
+bool check_collision(game_resource *game_res)
+{
+	int pixel_index;
+	pixel_index = (game_res->image_map.width*game_res->snake.snake_block[0].start_pos.y) + game_res->snake.snake_block[0].start_pos.x;
+	if(game_res->image_map_colors[pixel_index].r!=BLACK.r && game_res->image_map_colors[pixel_index].g!=BLACK.g || game_res->image_map_colors[pixel_index].b!=BLACK.b){
+		printf("Index is:%d\t%u\t%u\t%u\n", pixel_index,game_res->image_map_colors[pixel_index].r, game_res->image_map_colors[pixel_index].g, game_res->image_map_colors[pixel_index].b);
+		return true;
+	}
+	return false;
+}
