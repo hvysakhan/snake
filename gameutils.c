@@ -17,7 +17,7 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res)
 			key_q_tail = node;
 			key_q_head = node;
 			key_q_tail->key = key;
-			key_q_tail->rc = 4;
+			key_q_tail->rc = game_res->snake.snake_len;
 			key_q_tail->next = NULL;
 
 		}else if((game_res->snake.snake_block[0].block_direction == BLOCK_LEFT || game_res->snake.snake_block[0].block_direction == BLOCK_RIGHT) && (key == KEY_UP || key == KEY_DOWN)){
@@ -26,7 +26,7 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res)
 			key_q_tail = node;
 			key_q_head = node;
 			key_q_tail->key = key;
-			key_q_tail->rc = 4;
+			key_q_tail->rc = game_res->snake.snake_len;
 			key_q_tail->next = NULL;
 		}
 		
@@ -36,7 +36,7 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res)
 			key_q_tail->next = node;
 			key_q_tail = key_q_tail->next;
 			key_q_tail->key = key;
-			key_q_tail->rc = 4;
+			key_q_tail->rc = game_res->snake.snake_len;
 			key_q_tail->next = NULL;
 
 	}else if((key_q_tail->key == KEY_LEFT || key_q_tail->key == KEY_RIGHT) && (key == KEY_UP || key == KEY_DOWN)){
@@ -45,7 +45,7 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res)
 			key_q_tail->next = node;
 			key_q_tail = key_q_tail->next;
 			key_q_tail->key = key;
-			key_q_tail->rc = 4;
+			key_q_tail->rc = game_res->snake.snake_len;
 			key_q_tail->next = NULL;
 	}
 	
@@ -141,21 +141,46 @@ void make_block_line(Vector2 start_pos, Vector2 end_pos, int block_length, int b
 	
 }
 
-void make_map(game_resource *game_res)
-{
+void set_map(game_resource *game_res){
 	if(game_res->level == LEVEL_1){
+		game_res->map.start_pos[0].x = 15;
+		game_res->map.start_pos[0].y = 0;
+		game_res->map.end_pos[0].x = 15;
+		game_res->map.end_pos[0].y = SCREENHEIGHT;
 
-		make_block_line((Vector2){15,0}, (Vector2){15, SCREENHEIGHT}, 40, 10, 30, BEIGE);
-		make_block_line((Vector2){SCREENWIDTH - 25, 0}, (Vector2){SCREENWIDTH-25, SCREENHEIGHT}, 40, 10, 30, BEIGE);
-		make_block_line((Vector2){0,15}, (Vector2){SCREENWIDTH, 15}, 40, 10, 30, BEIGE);
-		make_block_line((Vector2){0, SCREENHEIGHT - 25}, (Vector2){SCREENWIDTH, SCREENHEIGHT - 25}, 40, 10, 30, BEIGE);
+		game_res->map.start_pos[1].x = SCREENWIDTH - 25;
+		game_res->map.start_pos[1].y = 0;
+		game_res->map.end_pos[1].x = SCREENWIDTH - 25;
+		game_res->map.end_pos[1].y = SCREENHEIGHT;
+
+		game_res->map.start_pos[2].x = 0;
+		game_res->map.start_pos[2].y = 15;
+		game_res->map.end_pos[2].x = SCREENWIDTH;
+		game_res->map.end_pos[2].y = 15;
+
+		game_res->map.start_pos[3].x = 0;
+		game_res->map.start_pos[3].y = SCREENHEIGHT - 25;
+		game_res->map.end_pos[3].x = SCREENWIDTH;
+		game_res->map.end_pos[3].y = SCREENHEIGHT - 25;
+		
 	}
+}
+
+void make_map(game_resource *game_res)
+{		
+	for(int i=0; i<4; i++){
+		make_block_line(game_res->map.start_pos[i], game_res->map.end_pos[i], 40, 10, 30, BEIGE);	
+	}
+
 }
 
 
 void make_snake(game_resource *gr, int velocity, Color color)
 {
-	int moved_block[4] = {-1, -1, -1, -1}, moved_block_iter=0;
+	int moved_block[MAXLEN], moved_block_iter=0;
+	for(int i=0;i<MAXLEN;i++){
+		moved_block[i] = -1;
+	}
 
 	key_press_q_t *traverse_ptr = key_q_head;
 	key_press_q_t *delete_ptr = NULL;
@@ -175,7 +200,7 @@ void make_snake(game_resource *gr, int velocity, Color color)
 
 	if(key_q_head == NULL){
 		key_q_tail = NULL;
-		for(int i=0; i<4; i++){
+		for(int i=0; i<gr->snake.snake_len; i++){
 			if(gr->snake.snake_block[i].block_direction == BLOCK_RIGHT){
 				gr->snake.snake_block[i].start_pos.x +=(float)velocity;
 				gr->snake.snake_block[i].end_pos.x += (float)velocity;
@@ -194,15 +219,15 @@ void make_snake(game_resource *gr, int velocity, Color color)
 		while (traverse_ptr != NULL){
 			sb *traverse_snake_block;
 			printf("traverse_ptr rc is %d \n", traverse_ptr->rc);
-			traverse_snake_block = &gr->snake.snake_block[4 - traverse_ptr->rc];
+			traverse_snake_block = &gr->snake.snake_block[gr->snake.snake_len - traverse_ptr->rc];
 			bool already_moved = false;
 			for(int k=0; k<moved_block_iter; k++){
-				if((4- traverse_ptr->rc) == moved_block[k]){
+				if((gr->snake.snake_len- traverse_ptr->rc) == moved_block[k]){
 					already_moved = true;
 				}
 			}
 			if(already_moved == false){
-				moved_block[moved_block_iter] = 4 - traverse_ptr->rc;
+				moved_block[moved_block_iter] = gr->snake.snake_len - traverse_ptr->rc;
 				moved_block_iter+=1;
 				if(traverse_ptr->key == KEY_RIGHT){
 					traverse_snake_block->block_direction = BLOCK_RIGHT;
@@ -248,7 +273,7 @@ void make_snake(game_resource *gr, int velocity, Color color)
 		}
 
 
-        for(int i=0; i<4; i++){
+        for(int i=0; i<gr->snake.snake_len; i++){
         	bool run_switch = true;
         	for (int j=0; j<moved_block_iter; j++){
         		if (moved_block[j] == i){
@@ -293,7 +318,7 @@ void make_snake(game_resource *gr, int velocity, Color color)
 	Vector2 temp_vec_start, temp_vec_end;
 
 	//to make it a block rather than a line
-	for(int i=0; i<4;i++){
+	for(int i=0; i<gr->snake.snake_len;i++){
 
 		if(gr->snake.snake_block[i].start_pos.x > gr->snake.snake_block[i].end_pos.x){
 			temp_vec_start.x = gr->snake.snake_block[i].start_pos.x;

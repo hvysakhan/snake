@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <raylib.h>
 #include "gameutils.h"
@@ -9,8 +10,9 @@
 void set_snake_intial_position(game_resource *game_res)
 {
 	game_res->is_map_loaded = MAP_NOT_LOADED;
+	game_res->snake.snake_len +=1;
 	float start_x = 460, start_y = 300, end_x = 420, end_y = 300;
-	for(int i=0; i<4; i++){
+	for(int i=0; i<game_res->snake.snake_len; i++){
 		game_res->snake.snake_block[i].start_pos = (Vector2){start_x, start_y};
 		game_res->snake.snake_block[i].end_pos = (Vector2){end_x, end_y};
 		game_res->snake.snake_block[i].block_direction = BLOCK_RIGHT;
@@ -38,6 +40,7 @@ int main(void)
     line_end_pos.x = SCREENWIDTH;
     line_end_pos.y = SCREENHEIGHT;
 
+
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, TITLE);
 
 	SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
@@ -45,11 +48,17 @@ int main(void)
 	int rotation = 0;
 	bool drawtext = true;
 	float snake_start_pos_x = 300;
-	Image map;
 	game_resource game_res;
+
+	game_res.map.start_pos = (Vector2 *)malloc(10*sizeof(Vector2));
+	game_res.map.end_pos = (Vector2 *)malloc(10*sizeof(Vector2));
+	game_res.map.color = (Color *)malloc(10*sizeof(Color));
+	game_res.map.thickness = (float *)malloc(10*sizeof(float));
+	game_res.level = LEVEL_1;
+	game_res.snake.snake_len = 4;
+	set_map(&game_res);
 	set_snake_intial_position(&game_res);
 	
-	Color *map_colors;
 	int pixel_index;
 	bool keypressed = false;
 	int update_speed=60;
@@ -67,62 +76,63 @@ int main(void)
 	    if (drawtext){DrawTextPro(GetFontDefault(),title_text, pos2, org2, rotation, fontsize, 10, MAROON);}
 	    else{
 	    	inital_count += 1;
-	    	game_res.level = LEVEL_1;
 	    	make_map(&game_res);
 	    	if(game_res.is_map_loaded == MAP_NOT_LOADED){game_res.is_map_loaded = MAP_LOADED;}	    	
-	    	// make_snake((Vector2){snake_start_pos_x, 300}, (Vector2){snake_start_pos_x + 160, 300}, RED);
-	    	make_snake(&game_res, 0, RED);
-	    	if(inital_count%60 ==0)
-	    	{
-	    		make_snake(&game_res, 40, RED);
-	    		snake_start_pos_x += 40;
-	    		inital_count = 0;
+	    	if(game_res.is_map_loaded == MAP_LOADED_AND_SAVED){
+	    		make_snake(&game_res, 0, RED);
+	    		if(inital_count%60 ==0)
+	    		{
+	    			make_snake(&game_res, 40, RED);
+	    			snake_start_pos_x += 40;
+	    			inital_count = 0;
+	    		}
+	    		if(IsKeyPressed(KEY_UP))
+	    		{
+	    			printf("UP Key Pressed\n");
+	    			make_keypress_node(KEY_UP, &game_res);
+	    			traverse_keypress();
+	    		}else if(IsKeyPressed(KEY_DOWN))
+	    		{
+	    			printf("Down Key Pressed\n");
+	    			make_keypress_node(KEY_DOWN, &game_res);
+	    			traverse_keypress();
+	    		}else if(IsKeyPressed(KEY_RIGHT))
+	    		{
+	    			printf("Right Key Pressed\n");
+	    			make_keypress_node(KEY_RIGHT, &game_res);
+	    			traverse_keypress();
+	    		}else if(IsKeyPressed(KEY_LEFT))
+	    		{
+	    			printf("Left Key Pressed\n");
+	    			make_keypress_node(KEY_LEFT, &game_res);
+	    			traverse_keypress();
+	    		}
 	    	}
-	    	if(IsKeyPressed(KEY_UP))
-	    	{
-	    		printf("UP Key Pressed\n");
-	    		make_keypress_node(KEY_UP, &game_res);
-	    		traverse_keypress();
-	    	}else if(IsKeyPressed(KEY_DOWN))
-	    	{
-	    		printf("Down Key Pressed\n");
-	    		make_keypress_node(KEY_DOWN, &game_res);
-	    		traverse_keypress();
-	    	}else if(IsKeyPressed(KEY_RIGHT))
-	    	{
-	    		printf("Right Key Pressed\n");
-	    		make_keypress_node(KEY_RIGHT, &game_res);
-	    		traverse_keypress();
-	    	}else if(IsKeyPressed(KEY_LEFT))
-	    	{
-	    		printf("Left Key Pressed\n");
-	    		make_keypress_node(KEY_LEFT, &game_res);
-	    		traverse_keypress();
-	    	}
+	    	
 	    }
 			    
 	    EndDrawing();
 
 	    if(game_res.is_map_loaded == MAP_LOADED)
 	    {
-	    	map = LoadImageFromScreen();	
-	    	map_colors = LoadImageColors(map);
+	    	game_res.image_map = LoadImageFromScreen();	
+	    	game_res.image_map_colors = LoadImageColors(game_res.image_map);
 	    	game_res.is_map_loaded = MAP_LOADED_AND_SAVED;
 	    }
 	    if(game_res.is_map_loaded == MAP_LOADED_AND_SAVED)
 	    {
 	    	if((game_res.snake.snake_block[0].block_direction == BLOCK_LEFT) || (game_res.snake.snake_block[0].block_direction == BLOCK_RIGHT)){
-	    		pixel_index = (map.width*game_res.snake.snake_block[0].start_pos.y) + game_res.snake.snake_block[0].start_pos.x;
-	    		if(map_colors[pixel_index].r!=BLACK.r && map_colors[pixel_index].g!=BLACK.g || map_colors[pixel_index].b!=BLACK.b){
-	    			printf("Index is:%d\t%u\t%u\t%u\n", pixel_index,map_colors[pixel_index].r, map_colors[pixel_index].g, map_colors[pixel_index].b);
+	    		pixel_index = (game_res.image_map.width*game_res.snake.snake_block[0].start_pos.y) + game_res.snake.snake_block[0].start_pos.x;
+	    		if(game_res.image_map_colors[pixel_index].r!=BLACK.r && game_res.image_map_colors[pixel_index].g!=BLACK.g || game_res.image_map_colors[pixel_index].b!=BLACK.b){
+	    			printf("Index is:%d\t%u\t%u\t%u\n", pixel_index,game_res.image_map_colors[pixel_index].r, game_res.image_map_colors[pixel_index].g, game_res.image_map_colors[pixel_index].b);
 	    			set_snake_intial_position(&game_res);
 	    			delete_all_keypress_node();
 
 	    		}
 	    	}else{
-	    		pixel_index = (map.width*game_res.snake.snake_block[0].start_pos.y) + game_res.snake.snake_block[0].start_pos.x;
-	    		if(map_colors[pixel_index].r!=BLACK.r && map_colors[pixel_index].g!=BLACK.g || map_colors[pixel_index].b!=BLACK.b){
-	    			printf("Index is:%d\t%u\t%u\t%u\n", pixel_index,map_colors[pixel_index].r, map_colors[pixel_index].g, map_colors[pixel_index].b);
+	    		pixel_index = (game_res.image_map.width*game_res.snake.snake_block[0].start_pos.y) + game_res.snake.snake_block[0].start_pos.x;
+	    		if(game_res.image_map_colors[pixel_index].r!=BLACK.r && game_res.image_map_colors[pixel_index].g!=BLACK.g || game_res.image_map_colors[pixel_index].b!=BLACK.b){
+	    			printf("Index is:%d\t%u\t%u\t%u\n", pixel_index,game_res.image_map_colors[pixel_index].r, game_res.image_map_colors[pixel_index].g, game_res.image_map_colors[pixel_index].b);
 	    			set_snake_intial_position(&game_res);
 	    			delete_all_keypress_node();
 
@@ -138,8 +148,13 @@ int main(void)
 	}
 
 
+
 	delete_all_keypress_node();
-	UnloadImage(map);
-	UnloadImageColors(map_colors);
+	UnloadImage(game_res.image_map);
+	UnloadImageColors(game_res.image_map_colors);
+	free(game_res.map.start_pos);
+	free(game_res.map.end_pos);
+	free(game_res.map.color);
+	free(game_res.map.thickness);
 	return 0;	
 }

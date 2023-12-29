@@ -10,6 +10,10 @@
 	#define SCREENHEIGHT  720
 #endif
 
+#ifndef MAXLEN
+	#define MAXLEN 100
+#endif
+
 typedef enum{
 	MAP_NOT_LOADED,
 	MAP_LOADED,
@@ -44,13 +48,15 @@ typedef struct{
 }sb;
 
 typedef struct{
-	sb snake_block[4];	
+	sb snake_block[MAXLEN];	
+	int snake_len;
 }snake;
 
 typedef  struct {
 	Vector2 *start_pos;
 	Vector2 *end_pos;
 	Color *color;
+	float *thickness;
 }map;
 
 typedef struct {
@@ -58,10 +64,14 @@ typedef struct {
 	is_map_loaded is_map_loaded;
 	snake snake;
 	map map;
+	Image image_map;
+	Color *image_map_colors;
 }game_resource;
 
 
+
 void make_map(game_resource *game_res);
+void set_map(game_resource *game_res);
 void make_snake(game_resource *gr, int velocity, Color color);
 void make_block_line(Vector2 start_pos, Vector2 end_pos, int block_length, int block_gap, float thickness,  Color color);
 void make_keypress_node(KeyboardKey key, game_resource *game_res);
