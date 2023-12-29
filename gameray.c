@@ -126,6 +126,8 @@ int main(void)
 	    	if(collision == true){
 	    		set_snake_intial_position(&game_res);
 	    		delete_all_keypress_node();
+	    		UnloadImage(game_res.image_map);
+	    		UnloadImageColors(game_res.image_map_colors);
 	    	}
 	    	
 	  	}
