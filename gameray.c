@@ -137,10 +137,32 @@ int main(void)
 	    }
 	    if(game_res.is_map_loaded == MAP_LOADED_AND_SAVED)
 	    {	
+	    	switch(game_res.snake.snake_block[0].block_direction){
 
-	    	collision_coin = CheckCollisionRecs((Rectangle){game_res.snake.snake_block[0].start_pos.x, game_res.snake.snake_block[0].start_pos.y, 30, 30},(Rectangle){game_res.coin.block_center.x, game_res.coin.block_center.y, 30, 30});
+                case BLOCK_UP:{
+                	collision_coin = CheckCollisionRecs((Rectangle){game_res.snake.snake_block[0].start_pos.x - 30, game_res.snake.snake_block[0].start_pos.y, 30, 30},(Rectangle){game_res.coin.block_center.x - 15, game_res.coin.block_center.y - 15, 30, 30});
+                	break;
+                }
+                case BLOCK_DOWN:{
+                	collision_coin = CheckCollisionRecs((Rectangle){game_res.snake.snake_block[0].start_pos.x - 30, game_res.snake.snake_block[0].start_pos.y, 30, 30},(Rectangle){game_res.coin.block_center.x - 15, game_res.coin.block_center.y - 15, 30, 30});
+                	break;
+                }
+                case BLOCK_RIGHT:{
+                	collision_coin = CheckCollisionRecs((Rectangle){game_res.snake.snake_block[0].end_pos.x, game_res.snake.snake_block[0].end_pos.y - 15, 30, 30},(Rectangle){game_res.coin.block_center.x - 15, game_res.coin.block_center.y - 15, 30, 30});
+                	break;
+                }
+                case BLOCK_LEFT:{
+                	collision_coin = CheckCollisionRecs((Rectangle){game_res.snake.snake_block[0].end_pos.x, game_res.snake.snake_block[0].end_pos.y - 15, 30, 30},(Rectangle){game_res.coin.block_center.x - 15, game_res.coin.block_center.y - 15, 30, 30});
+                	break;
+                }
+                default: {
+                	break;
+                }
+            }
+
 	    	collision = check_collision(&game_res);
 	    	if(collision == true){
+	    		update_frame=30;
 	    		set_snake_intial_position(&game_res);
 	    		delete_all_keypress_node();
 	    		UnloadImage(game_res.image_map);
