@@ -10,7 +10,10 @@
 void set_snake_intial_position(game_resource *game_res)
 {
 	game_res->is_map_loaded = MAP_NOT_LOADED;
-	game_res->snake.snake_len +=1;
+	if(game_res->snake.snake_len < 20){
+		game_res->snake.snake_len +=1;
+	}
+	
 	float start_x = 460, start_y = 300, end_x = 420, end_y = 300;
 	for(int i=0; i<game_res->snake.snake_len; i++){
 		game_res->snake.snake_block[i].start_pos = (Vector2){start_x, start_y};
@@ -24,14 +27,14 @@ void set_snake_intial_position(game_resource *game_res)
 int main(void)
 {
 	float fontsize = 50;
-	char title_text[] = "Hello, How are you?";
+	char title_text[] = "---SNAKE---";
 	int title_text_len = strlen(title_text);
 	printf("len of disp string:\t%d\n",title_text_len);
 	
 
 	Vector2 pos2, org2, line_start_pos, line_end_pos;
 	// pos2.x = (float)SCREENWIDTH/2 - ((float)title_text_len * (float)fontsize)/4;
-	pos2.x = (float)SCREENWIDTH/2 - 50;
+	pos2.x = (float)SCREENWIDTH/2 ;
 	pos2.y = (float)SCREENHEIGHT/2;
 	org2.x = 200;
 	org2.y = 0;
@@ -85,11 +88,16 @@ int main(void)
 	    		make_snake(&game_res, 0, RED);
 	    		make_coin(&game_res, collision_coin);
 	    		if(collision_coin == true){
+	    			if(update_frame > 2){
+	    				update_frame = update_frame - 1;
+	    			}
+	    			
 	    			collision_coin = false;
 	    		}
 
 	    		if(inital_count%update_frame ==0)
 	    		{
+	    			printf(" update_frame %d\n",update_frame);
 	    			make_snake(&game_res, 40, RED);
 	    			snake_start_pos_x += 40;
 	    			inital_count = 0;
