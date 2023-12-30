@@ -178,7 +178,8 @@ void make_map(game_resource *game_res)
 
 void make_snake(game_resource *gr, int velocity, Color color)
 {
-	int moved_block[MAXLEN], moved_block_iter=0;
+	int snake_len = gr->snake.snake_len;
+	int moved_block[MAXLEN], moved_block_iter=MAXLEN - 1;
 	for(int i=0;i<MAXLEN;i++){
 		moved_block[i] = -1;
 	}
@@ -201,7 +202,7 @@ void make_snake(game_resource *gr, int velocity, Color color)
 
 	if(key_q_head == NULL){
 		key_q_tail = NULL;
-		for(int i=0; i<gr->snake.snake_len; i++){
+		for(int i=snake_len-1; i>=0; i--){
 			if(gr->snake.snake_block[i].block_direction == BLOCK_RIGHT){
 				gr->snake.snake_block[i].start_pos.x +=(float)velocity;
 				gr->snake.snake_block[i].end_pos.x += (float)velocity;
@@ -220,16 +221,16 @@ void make_snake(game_resource *gr, int velocity, Color color)
 		while (traverse_ptr != NULL){
 			sb *traverse_snake_block;
 			printf("traverse_ptr rc is %d \n", traverse_ptr->rc);
-			traverse_snake_block = &gr->snake.snake_block[gr->snake.snake_len - traverse_ptr->rc];
+			traverse_snake_block = &gr->snake.snake_block[traverse_ptr->rc - 1];
 			bool already_moved = false;
-			for(int k=0; k<moved_block_iter; k++){
-				if((gr->snake.snake_len- traverse_ptr->rc) == moved_block[k]){
+			for(int k= MAXLEN -1; k > (MAXLEN-1) - snake_len; k--){
+				if((traverse_ptr->rc - 1) == moved_block[k]){
 					already_moved = true;
 				}
 			}
 			if(already_moved == false){
-				moved_block[moved_block_iter] = gr->snake.snake_len - traverse_ptr->rc;
-				moved_block_iter+=1;
+				moved_block[moved_block_iter] = traverse_ptr->rc - 1;
+				moved_block_iter-=1;
 				if(traverse_ptr->key == KEY_RIGHT){
 					traverse_snake_block->block_direction = BLOCK_RIGHT;
 				}else if(traverse_ptr->key == KEY_LEFT){
@@ -274,9 +275,9 @@ void make_snake(game_resource *gr, int velocity, Color color)
 		}
 
 
-        for(int i=0; i<gr->snake.snake_len; i++){
+        for(int i=snake_len-1; i>=0; i--){
         	bool run_switch = true;
-        	for (int j=0; j<moved_block_iter; j++){
+        	for (int j=MAXLEN -1; j>moved_block_iter; j--){
         		if (moved_block[j] == i){
         			run_switch = false;
         		}
@@ -316,42 +317,16 @@ void make_snake(game_resource *gr, int velocity, Color color)
 
 	}
 	traverse_ptr = key_q_head;
-	Vector2 temp_vec_start, temp_vec_end;
 
-	//to make it a block rather than a line
-	for(int i=0; i<gr->snake.snake_len;i++){
-
-		if(gr->snake.snake_block[i].start_pos.x > gr->snake.snake_block[i].end_pos.x){
-			temp_vec_start.x = gr->snake.snake_block[i].start_pos.x;
-			temp_vec_end.x = gr->snake.snake_block[i].end_pos.x + 10;
-			temp_vec_start.y = gr->snake.snake_block[i].start_pos.y;
-			temp_vec_end.y = gr->snake.snake_block[i].end_pos.y;
-		}else if(gr->snake.snake_block[i].start_pos.x < gr->snake.snake_block[i].end_pos.x){
-			temp_vec_start.x = gr->snake.snake_block[i].start_pos.x;
-			temp_vec_end.x = gr->snake.snake_block[i].end_pos.x - 10;
-			temp_vec_start.y = gr->snake.snake_block[i].start_pos.y;
-			temp_vec_end.y = gr->snake.snake_block[i].end_pos.y;
-		}else if(gr->snake.snake_block[i].start_pos.y > gr->snake.snake_block[i].end_pos.y){
-			temp_vec_start.y = gr->snake.snake_block[i].start_pos.y;
-			temp_vec_end.y = gr->snake.snake_block[i].end_pos.y - 10;
-			temp_vec_start.x = gr->snake.snake_block[i].start_pos.x;
-			temp_vec_end.x = gr->snake.snake_block[i].end_pos.x;
-		}else if(gr->snake.snake_block[i].start_pos.y > gr->snake.snake_block[i].end_pos.y){
-			temp_vec_start.y = gr->snake.snake_block[i].start_pos.y;
-			temp_vec_end.y = gr->snake.snake_block[i].end_pos.y + 10;
-			temp_vec_start.x = gr->snake.snake_block[i].start_pos.x;
-			temp_vec_end.x = gr->snake.snake_block[i].end_pos.x;
-		}
-
-
-		DrawLineEx(temp_vec_start, temp_vec_end, 30, color);
+	for(int i=snake_len -1; i>=0 ;i--){
+		DrawLineEx(gr->snake.snake_block[i].start_pos, gr->snake.snake_block[i].end_pos, 30, color);
 	}
 }
 
 bool check_collision(game_resource *game_res)
 {
 	int pixel_index;
-	pixel_index = (game_res->image_map.width*game_res->snake.snake_block[0].start_pos.y) + game_res->snake.snake_block[0].start_pos.x;
+	pixel_index = (game_res->image_map.width*game_res->snake.snake_block[game_res->snake.snake_len -1].start_pos.y) + game_res->snake.snake_block[0].start_pos.x;
 	if(game_res->image_map_colors[pixel_index].r!=BLACK.r && game_res->image_map_colors[pixel_index].g!=BLACK.g || game_res->image_map_colors[pixel_index].b!=BLACK.b){
 		printf("Index is:%d\t%u\t%u\t%u\n", pixel_index,game_res->image_map_colors[pixel_index].r, game_res->image_map_colors[pixel_index].g, game_res->image_map_colors[pixel_index].b);
 		return true;
