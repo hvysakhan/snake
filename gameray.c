@@ -10,7 +10,7 @@
 void set_snake_intial_position(game_resource *game_res)
 {
 	game_res->is_map_loaded = MAP_NOT_LOADED;
-	
+	game_res->snake.snake_len = 4;
 	float start_x = 450, start_y = 300, end_x = 420, end_y = 300;
 	for(int i=game_res->snake.snake_len-1; i>=0; i--){
 		game_res->snake.snake_block[i].start_pos = (Vector2){start_x, start_y};
@@ -82,7 +82,7 @@ int main(void)
 	    	make_map(&game_res);
 	    	if(game_res.is_map_loaded == MAP_NOT_LOADED){game_res.is_map_loaded = MAP_LOADED;}	    	
 	    	if(game_res.is_map_loaded == MAP_LOADED_AND_SAVED){
-	    		make_snake(&game_res, 0, RED);
+	    		
 	    		make_coin(&game_res, collision_coin);
 	    		if(collision_coin == true){
 	    			if(update_frame > 2){
@@ -91,13 +91,14 @@ int main(void)
 	    			
 	    			collision_coin = false;
 	    		}
-
 	    		if(inital_count%update_frame ==0)
 	    		{
 	    			printf(" update_frame %d\n",update_frame);
 	    			make_snake(&game_res, 40, RED);
 	    			snake_start_pos_x += 40;
 	    			inital_count = 0;
+	    		}else{
+	    			make_snake(&game_res, 0, RED);
 	    		}
 	    		if(IsKeyPressed(KEY_UP))
 	    		{
