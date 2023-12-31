@@ -326,7 +326,7 @@ void make_snake(game_resource *gr, int velocity, Color color)
 bool check_collision(game_resource *game_res)
 {
 	int pixel_index;
-	pixel_index = (game_res->image_map.width*game_res->snake.snake_block[game_res->snake.snake_len -1].start_pos.y) + game_res->snake.snake_block[0].start_pos.x;
+	pixel_index = (game_res->image_map.width*game_res->snake.snake_block[game_res->snake.snake_len -1].start_pos.y) + game_res->snake.snake_block[game_res->snake.snake_len -1].start_pos.x;
 	if(game_res->image_map_colors[pixel_index].r!=BLACK.r && game_res->image_map_colors[pixel_index].g!=BLACK.g || game_res->image_map_colors[pixel_index].b!=BLACK.b){
 		printf("Index is:%d\t%u\t%u\t%u\n", pixel_index,game_res->image_map_colors[pixel_index].r, game_res->image_map_colors[pixel_index].g, game_res->image_map_colors[pixel_index].b);
 		return true;
@@ -343,4 +343,90 @@ void make_coin(game_resource *game_res, bool collision){
 	
 	DrawLineEx((Vector2){game_res->coin.block_center.x-15, game_res->coin.block_center.y},(Vector2){game_res->coin.block_center.x+15, game_res->coin.block_center.y}, 30, VIOLET);
 
+}
+
+bool check_collision_coin(game_resource *game_res){
+	int collision_coin = false;
+	switch(game_res->snake.snake_block[game_res->snake.snake_len-1].block_direction){
+
+        case BLOCK_UP:{
+       
+        	collision_coin = CheckCollisionRecs((Rectangle){game_res->snake.snake_block[game_res->snake.snake_len - 1].start_pos.x - 30, game_res->snake.snake_block[game_res->snake.snake_len - 1].start_pos.y, 35, 35},(Rectangle){game_res->coin.block_center.x - 15, game_res->coin.block_center.y - 15, 40, 40});
+        	break;
+        }
+        case BLOCK_DOWN:{
+        	
+        	collision_coin = CheckCollisionRecs((Rectangle){game_res->snake.snake_block[game_res->snake.snake_len - 1].start_pos.x - 30, game_res->snake.snake_block[game_res->snake.snake_len - 1].start_pos.y, 35, 35},(Rectangle){game_res->coin.block_center.x - 15, game_res->coin.block_center.y - 15, 40, 40});
+        	break;
+        }
+        case BLOCK_RIGHT:{
+        	
+        	collision_coin = CheckCollisionRecs((Rectangle){game_res->snake.snake_block[game_res->snake.snake_len - 1].end_pos.x, game_res->snake.snake_block[game_res->snake.snake_len - 1].end_pos.y - 15, 35, 35},(Rectangle){game_res->coin.block_center.x - 15, game_res->coin.block_center.y - 15, 40, 40});
+        	break;
+        }
+        case BLOCK_LEFT:{
+        	
+        	collision_coin = CheckCollisionRecs((Rectangle){game_res->snake.snake_block[game_res->snake.snake_len - 1].end_pos.x, game_res->snake.snake_block[game_res->snake.snake_len - 1].end_pos.y - 15, 35, 35},(Rectangle){game_res->coin.block_center.x - 15, game_res->coin.block_center.y - 15, 40, 40});
+        	break;
+       	}
+        
+    }
+    return collision_coin;
+}
+
+void add_snake_block(game_resource *game_res){
+		switch(game_res->snake.snake_block[game_res->snake.snake_len -1].block_direction){
+
+	    	case BLOCK_UP:{
+	    		int old_snake_len = game_res->snake.snake_len;
+	    		int new_snake_len = game_res->snake.snake_len + 1;
+	    		game_res->snake.snake_block[new_snake_len - 1].start_pos.y = game_res->snake.snake_block[old_snake_len - 1].end_pos.y - 40;
+	    		game_res->snake.snake_block[new_snake_len - 1].end_pos.y = game_res->snake.snake_block[new_snake_len - 1].start_pos.y;
+	    		game_res->snake.snake_block[new_snake_len - 1].start_pos.x = game_res->snake.snake_block[old_snake_len - 1].start_pos.x;
+	    		game_res->snake.snake_block[new_snake_len - 1].end_pos.x = game_res->snake.snake_block[old_snake_len - 1].end_pos.x;
+	    		game_res->snake.snake_block[new_snake_len - 1].block_direction = BLOCK_UP;
+
+	    		game_res->snake.snake_len +=1;
+
+	    		break;
+	    	}
+	    	case BLOCK_DOWN:{
+	    		int old_snake_len = game_res->snake.snake_len;
+	    		int new_snake_len = game_res->snake.snake_len + 1;
+	    		game_res->snake.snake_block[new_snake_len - 1].start_pos.y = game_res->snake.snake_block[old_snake_len - 1].end_pos.y + 40;
+	    		game_res->snake.snake_block[new_snake_len - 1].end_pos.y = game_res->snake.snake_block[new_snake_len - 1].start_pos.y;
+	    		game_res->snake.snake_block[new_snake_len - 1].start_pos.x = game_res->snake.snake_block[old_snake_len - 1].start_pos.x;
+	    		game_res->snake.snake_block[new_snake_len - 1].end_pos.x = game_res->snake.snake_block[old_snake_len - 1].end_pos.x;
+	    		game_res->snake.snake_block[new_snake_len - 1].block_direction = BLOCK_DOWN;
+
+	    		game_res->snake.snake_len +=1;
+
+	    		break;
+	    	}
+	    	case BLOCK_RIGHT:{
+	    		int old_snake_len = game_res->snake.snake_len;
+	    		int new_snake_len = game_res->snake.snake_len + 1;
+	    		game_res->snake.snake_block[new_snake_len - 1].end_pos.x = game_res->snake.snake_block[old_snake_len - 1].start_pos.x + 10;
+	    		game_res->snake.snake_block[new_snake_len - 1].start_pos.x = game_res->snake.snake_block[new_snake_len - 1].end_pos.x + 30;
+	    		game_res->snake.snake_block[new_snake_len - 1].start_pos.y = game_res->snake.snake_block[old_snake_len - 1].end_pos.y;
+	    		game_res->snake.snake_block[new_snake_len - 1].end_pos.y = game_res->snake.snake_block[old_snake_len - 1].end_pos.y;
+	    		game_res->snake.snake_block[new_snake_len - 1].block_direction = BLOCK_RIGHT;
+
+	    		game_res->snake.snake_len +=1;
+	    		break;
+	    	}
+	    	case BLOCK_LEFT:{
+	    		int old_snake_len = game_res->snake.snake_len;
+	    		int new_snake_len = game_res->snake.snake_len + 1;
+	    		game_res->snake.snake_block[new_snake_len - 1].start_pos.x = game_res->snake.snake_block[old_snake_len - 1].end_pos.x - 10;
+	    		game_res->snake.snake_block[new_snake_len - 1].end_pos.x = game_res->snake.snake_block[new_snake_len - 1].start_pos.x - 30;
+	    		game_res->snake.snake_block[new_snake_len - 1].start_pos.y = game_res->snake.snake_block[old_snake_len - 1].end_pos.y;
+	    		game_res->snake.snake_block[new_snake_len - 1].end_pos.y = game_res->snake.snake_block[old_snake_len - 1].end_pos.y;
+	    		game_res->snake.snake_block[new_snake_len - 1].block_direction = BLOCK_LEFT;
+
+	    		game_res->snake.snake_len +=1;
+	    		break;
+	    	}
+	      	default:{break;}
+	    }
 }

@@ -85,5 +85,6 @@ void traverse_keypress(void);
 void delete_all_keypress_node(void);
 bool check_collision(game_resource *game_res);
 void make_coin(game_resource *game_res, bool collision);
-
+bool check_collision_coin(game_resource *game_res);
+void add_snake_block(game_resource *game_res);
 #endif

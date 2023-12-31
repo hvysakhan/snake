@@ -134,88 +134,9 @@ int main(void)
 	    }
 	    if(game_res.is_map_loaded == MAP_LOADED_AND_SAVED)
 	    {	
-	    	switch(game_res.snake.snake_block[game_res.snake.snake_len-1].block_direction){
-
-                case BLOCK_UP:{
-                	// printf("\nhello up %f\t%f\t%f\t%f\n",game_res.snake.snake_block[game_res.snake.snake_len - 1].end_pos.x, game_res.snake.snake_block[game_res.snake.snake_len - 1].end_pos.y - 15, game_res.coin.block_center.x - 15, game_res.coin.block_center.y - 15);
-                	collision_coin = CheckCollisionRecs((Rectangle){game_res.snake.snake_block[game_res.snake.snake_len - 1].start_pos.x - 30, game_res.snake.snake_block[game_res.snake.snake_len - 1].start_pos.y, 35, 35},(Rectangle){game_res.coin.block_center.x - 15, game_res.coin.block_center.y - 15, 40, 40});
-                	break;
-                }
-                case BLOCK_DOWN:{
-                	// printf("\nhello down %f\t%f\t%f\t%f\n",game_res.snake.snake_block[game_res.snake.snake_len - 1].end_pos.x, game_res.snake.snake_block[game_res.snake.snake_len - 1].end_pos.y - 15, game_res.coin.block_center.x - 15, game_res.coin.block_center.y - 15);
-                	collision_coin = CheckCollisionRecs((Rectangle){game_res.snake.snake_block[game_res.snake.snake_len - 1].start_pos.x - 30, game_res.snake.snake_block[game_res.snake.snake_len - 1].start_pos.y, 35, 35},(Rectangle){game_res.coin.block_center.x - 15, game_res.coin.block_center.y - 15, 40, 40});
-                	break;
-                }
-                case BLOCK_RIGHT:{
-                	// printf("\nhello right %f\t%f\t%f\t%f\n",game_res.snake.snake_block[game_res.snake.snake_len - 1].end_pos.x, game_res.snake.snake_block[game_res.snake.snake_len - 1].end_pos.y - 15, game_res.coin.block_center.x - 15, game_res.coin.block_center.y - 15);
-                	collision_coin = CheckCollisionRecs((Rectangle){game_res.snake.snake_block[game_res.snake.snake_len - 1].end_pos.x, game_res.snake.snake_block[game_res.snake.snake_len - 1].end_pos.y - 15, 35, 35},(Rectangle){game_res.coin.block_center.x - 15, game_res.coin.block_center.y - 15, 40, 40});
-                	break;
-                }
-                case BLOCK_LEFT:{
-                	// printf("\nhello left %f\t%f\t%f\t%f\n",game_res.snake.snake_block[game_res.snake.snake_len - 1].end_pos.x, game_res.snake.snake_block[game_res.snake.snake_len - 1].end_pos.y - 15, game_res.coin.block_center.x - 15, game_res.coin.block_center.y - 15);
-                	collision_coin = CheckCollisionRecs((Rectangle){game_res.snake.snake_block[game_res.snake.snake_len - 1].end_pos.x, game_res.snake.snake_block[game_res.snake.snake_len - 1].end_pos.y - 15, 35, 35},(Rectangle){game_res.coin.block_center.x - 15, game_res.coin.block_center.y - 15, 40, 40});
-                	break;
-               	}
-                
-            }
-            if(collision_coin){
-            	printf("collision detected\n");
-            }
+	    	collision_coin = check_collision_coin(&game_res);
             if(collision_coin == true){
-            	switch(game_res.snake.snake_block[game_res.snake.snake_len -1].block_direction){
-
-                	case BLOCK_UP:{
-                		int old_snake_len = game_res.snake.snake_len;
-                		int new_snake_len = game_res.snake.snake_len + 1;
-                		game_res.snake.snake_block[new_snake_len - 1].start_pos.y = game_res.snake.snake_block[old_snake_len - 1].end_pos.y - 40;
-                		game_res.snake.snake_block[new_snake_len - 1].end_pos.y = game_res.snake.snake_block[new_snake_len - 1].start_pos.y;
-                		game_res.snake.snake_block[new_snake_len - 1].start_pos.x = game_res.snake.snake_block[old_snake_len - 1].start_pos.x;
-                		game_res.snake.snake_block[new_snake_len - 1].end_pos.x = game_res.snake.snake_block[old_snake_len - 1].end_pos.x;
-                		game_res.snake.snake_block[new_snake_len - 1].block_direction = BLOCK_UP;
-
-                		game_res.snake.snake_len +=1;
-
-                		break;
-                	}
-                	case BLOCK_DOWN:{
-                		int old_snake_len = game_res.snake.snake_len;
-                		int new_snake_len = game_res.snake.snake_len + 1;
-                		game_res.snake.snake_block[new_snake_len - 1].start_pos.y = game_res.snake.snake_block[old_snake_len - 1].end_pos.y + 40;
-                		game_res.snake.snake_block[new_snake_len - 1].end_pos.y = game_res.snake.snake_block[new_snake_len - 1].start_pos.y;
-                		game_res.snake.snake_block[new_snake_len - 1].start_pos.x = game_res.snake.snake_block[old_snake_len - 1].start_pos.x;
-                		game_res.snake.snake_block[new_snake_len - 1].end_pos.x = game_res.snake.snake_block[old_snake_len - 1].end_pos.x;
-                		game_res.snake.snake_block[new_snake_len - 1].block_direction = BLOCK_DOWN;
-
-                		game_res.snake.snake_len +=1;
-
-                		break;
-                	}
-                	case BLOCK_RIGHT:{
-                		int old_snake_len = game_res.snake.snake_len;
-                		int new_snake_len = game_res.snake.snake_len + 1;
-                		game_res.snake.snake_block[new_snake_len - 1].end_pos.x = game_res.snake.snake_block[old_snake_len - 1].start_pos.x + 10;
-                		game_res.snake.snake_block[new_snake_len - 1].start_pos.x = game_res.snake.snake_block[new_snake_len - 1].end_pos.x + 30;
-                		game_res.snake.snake_block[new_snake_len - 1].start_pos.y = game_res.snake.snake_block[old_snake_len - 1].end_pos.y;
-                		game_res.snake.snake_block[new_snake_len - 1].end_pos.y = game_res.snake.snake_block[old_snake_len - 1].end_pos.y;
-                		game_res.snake.snake_block[new_snake_len - 1].block_direction = BLOCK_RIGHT;
-
-                		game_res.snake.snake_len +=1;
-                		break;
-                	}
-                	case BLOCK_LEFT:{
-                		int old_snake_len = game_res.snake.snake_len;
-                		int new_snake_len = game_res.snake.snake_len + 1;
-                		game_res.snake.snake_block[new_snake_len - 1].start_pos.x = game_res.snake.snake_block[old_snake_len - 1].end_pos.x - 10;
-                		game_res.snake.snake_block[new_snake_len - 1].end_pos.x = game_res.snake.snake_block[new_snake_len - 1].start_pos.x - 30;
-                		game_res.snake.snake_block[new_snake_len - 1].start_pos.y = game_res.snake.snake_block[old_snake_len - 1].end_pos.y;
-                		game_res.snake.snake_block[new_snake_len - 1].end_pos.y = game_res.snake.snake_block[old_snake_len - 1].end_pos.y;
-                		game_res.snake.snake_block[new_snake_len - 1].block_direction = BLOCK_LEFT;
-
-                		game_res.snake.snake_len +=1;
-                		break;
-                	}
-                  	default:{break;}
-                }
+            	add_snake_block(&game_res);
             }
 
 	    	collision = check_collision(&game_res);
