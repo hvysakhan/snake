@@ -12,7 +12,7 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res)
 	
 	if(key_q_tail == NULL && key_q_head == NULL)
 	{
-		if((game_res->snake.snake_block[0].block_direction == BLOCK_UP || game_res->snake.snake_block[0].block_direction == BLOCK_DOWN) && (key == KEY_RIGHT || key == KEY_LEFT)){
+		if((game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_UP || game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_DOWN) && (key == KEY_RIGHT || key == KEY_LEFT)){
 			printf("NULL condition\n");
 			key_press_q_t *node = (key_press_q_t *)malloc(sizeof(key_press_q_t));
 			key_q_tail = node;
@@ -21,7 +21,7 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res)
 			key_q_tail->rc = game_res->snake.snake_len;
 			key_q_tail->next = NULL;
 
-		}else if((game_res->snake.snake_block[0].block_direction == BLOCK_LEFT || game_res->snake.snake_block[0].block_direction == BLOCK_RIGHT) && (key == KEY_UP || key == KEY_DOWN)){
+		}else if((game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_LEFT || game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_RIGHT) && (key == KEY_UP || key == KEY_DOWN)){
 			printf("NULL condition\n");
 			key_press_q_t *node = (key_press_q_t *)malloc(sizeof(key_press_q_t));
 			key_q_tail = node;
@@ -31,7 +31,7 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res)
 			key_q_tail->next = NULL;
 		}
 		
-	}else if((key_q_tail->key == KEY_UP || key_q_tail->key == KEY_DOWN) && (key == KEY_RIGHT || key == KEY_LEFT)){
+	}else if((game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_UP || game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_DOWN) && (key == KEY_RIGHT || key == KEY_LEFT)){
 			key_press_q_t *node = (key_press_q_t *)malloc(sizeof(key_press_q_t));
 			printf("condition satisfied\n");
 			key_q_tail->next = node;
@@ -40,7 +40,7 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res)
 			key_q_tail->rc = game_res->snake.snake_len;
 			key_q_tail->next = NULL;
 
-	}else if((key_q_tail->key == KEY_LEFT || key_q_tail->key == KEY_RIGHT) && (key == KEY_UP || key == KEY_DOWN)){
+	}else if((game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_LEFT || game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_RIGHT) && (key == KEY_UP || key == KEY_DOWN)){
 			key_press_q_t *node = (key_press_q_t *)malloc(sizeof(key_press_q_t));
 			printf("condition satisfied\n");
 			key_q_tail->next = node;
@@ -49,8 +49,7 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res)
 			key_q_tail->rc = game_res->snake.snake_len;
 			key_q_tail->next = NULL;
 	}
-	
-	
+		
 }
 
 void delete_keypress_node(void)
@@ -427,6 +426,8 @@ void add_snake_block(game_resource *game_res){
 	    		game_res->snake.snake_len +=1;
 	    		break;
 	    	}
-	      	default:{break;}
+	      	default:{
+	      		break;
+	      	}
 	    }
 }

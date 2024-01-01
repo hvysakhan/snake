@@ -69,7 +69,6 @@ int main(void)
 	while (!WindowShouldClose())    // Detect window close button or ESC key
 	{
 		// Update
-		// rotation = (rotation + 10) % 360;
 		if(drawtext){fontsize = fontsize + 0.1;}
 		if(fontsize >= 60.0){drawtext=false;}
 		pos2.x = pos2.x - 0.3;
@@ -84,13 +83,7 @@ int main(void)
 	    	if(game_res.is_map_loaded == MAP_LOADED_AND_SAVED){
 	    		
 	    		make_coin(&game_res, collision_coin);
-	    		if(collision_coin == true){
-	    			if(update_frame > 2){
-	    				update_frame = update_frame - 1;
-	    			}
-	    			
-	    			collision_coin = false;
-	    		}
+	    		
 	    		if(inital_count%update_frame ==0)
 	    		{
 	    			printf(" update_frame %d\n",update_frame);
@@ -99,6 +92,13 @@ int main(void)
 	    			inital_count = 0;
 	    		}else{
 	    			make_snake(&game_res, 0, RED);
+	    		}
+	    		collision_coin = check_collision_coin(&game_res);
+	    		if(collision_coin == true){
+	    		    add_snake_block(&game_res);
+	    		    if(update_frame > 2){
+	    		    	update_frame = update_frame - 1;
+	    		    }
 	    		}
 	    		if(IsKeyPressed(KEY_UP))
 	    		{
@@ -121,9 +121,12 @@ int main(void)
 	    			make_keypress_node(KEY_LEFT, &game_res);
 	    			traverse_keypress();
 	    		}
+	    		
 	    	}
 	    	
 	    }
+
+	    
 			    
 	    EndDrawing();
 
@@ -135,11 +138,6 @@ int main(void)
 	    }
 	    if(game_res.is_map_loaded == MAP_LOADED_AND_SAVED)
 	    {	
-	    	collision_coin = check_collision_coin(&game_res);
-            if(collision_coin == true){
-            	add_snake_block(&game_res);
-            }
-
 	    	collision = check_collision(&game_res);
 	    	if(collision == true){
 	    		update_frame=30;
