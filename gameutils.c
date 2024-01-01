@@ -12,16 +12,7 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res)
 	
 	if(key_q_tail == NULL && key_q_head == NULL)
 	{
-		if((game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_UP || game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_DOWN) && (key == KEY_RIGHT || key == KEY_LEFT)){
-			printf("NULL condition\n");
-			key_press_q_t *node = (key_press_q_t *)malloc(sizeof(key_press_q_t));
-			key_q_tail = node;
-			key_q_head = node;
-			key_q_tail->key = key;
-			key_q_tail->rc = game_res->snake.snake_len;
-			key_q_tail->next = NULL;
-
-		}else if((game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_LEFT || game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_RIGHT) && (key == KEY_UP || key == KEY_DOWN)){
+		if(((game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_UP || game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_DOWN) && (key == KEY_RIGHT || key == KEY_LEFT)) || ((game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_LEFT || game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_RIGHT) && (key == KEY_UP || key == KEY_DOWN))){
 			printf("NULL condition\n");
 			key_press_q_t *node = (key_press_q_t *)malloc(sizeof(key_press_q_t));
 			key_q_tail = node;
@@ -31,7 +22,7 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res)
 			key_q_tail->next = NULL;
 		}
 		
-	}else if((game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_UP || game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_DOWN) && (key == KEY_RIGHT || key == KEY_LEFT)){
+	}else if(((game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_UP || game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_DOWN) && (key == KEY_RIGHT || key == KEY_LEFT)) || ((game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_LEFT || game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_RIGHT) && (key == KEY_UP || key == KEY_DOWN))){
 			key_press_q_t *node = (key_press_q_t *)malloc(sizeof(key_press_q_t));
 			printf("condition satisfied\n");
 			key_q_tail->next = node;
@@ -40,14 +31,6 @@ void make_keypress_node(KeyboardKey key, game_resource *game_res)
 			key_q_tail->rc = game_res->snake.snake_len;
 			key_q_tail->next = NULL;
 
-	}else if((game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_LEFT || game_res->snake.snake_block[game_res->snake.snake_len - 1].block_direction == BLOCK_RIGHT) && (key == KEY_UP || key == KEY_DOWN)){
-			key_press_q_t *node = (key_press_q_t *)malloc(sizeof(key_press_q_t));
-			printf("condition satisfied\n");
-			key_q_tail->next = node;
-			key_q_tail = key_q_tail->next;
-			key_q_tail->key = key;
-			key_q_tail->rc = game_res->snake.snake_len;
-			key_q_tail->next = NULL;
 	}
 		
 }
@@ -324,6 +307,7 @@ void make_snake(game_resource *gr, int velocity, Color color)
 
 bool check_collision(game_resource *game_res)
 {
+
 	int pixel_index;
 	pixel_index = (game_res->image_map.width*game_res->snake.snake_block[game_res->snake.snake_len -1].start_pos.y) + game_res->snake.snake_block[game_res->snake.snake_len -1].start_pos.x;
 	if(game_res->image_map_colors[pixel_index].r!=BLACK.r && game_res->image_map_colors[pixel_index].g!=BLACK.g || game_res->image_map_colors[pixel_index].b!=BLACK.b){
@@ -333,7 +317,20 @@ bool check_collision(game_resource *game_res)
 	return false;
 }
 
+bool check_self_collision(game_resource *game_res)
+{
+	int self_collision = false;
+	for(int i=0; i< game_res->snake.snake_len -2; i++){
+		self_collision = CheckCollisionRecs((Rectangle){game_res->snake.snake_block[game_res->snake.snake_len - 1].end_pos.x, game_res->snake.snake_block[game_res->snake.snake_len - 1].start_pos.y, 30, 30},(Rectangle){game_res->snake.snake_block[i].end_pos.x, game_res->snake.snake_block[i].start_pos.y, 30, 30});
+		if(self_collision == true){
+			break;
+		}
+	}
+	return self_collision;
+}
+
 void make_coin(game_resource *game_res, bool collision){
+
 	if(collision == true){
 		SetRandomSeed(time(NULL));
 		game_res->coin.block_center.x = GetRandomValue(100, SCREENWIDTH - 100);
@@ -346,30 +343,9 @@ void make_coin(game_resource *game_res, bool collision){
 
 bool check_collision_coin(game_resource *game_res){
 	int collision_coin = false;
-	switch(game_res->snake.snake_block[game_res->snake.snake_len-1].block_direction){
 
-        case BLOCK_UP:{
-       
-        	collision_coin = CheckCollisionRecs((Rectangle){game_res->snake.snake_block[game_res->snake.snake_len - 1].start_pos.x - 30, game_res->snake.snake_block[game_res->snake.snake_len - 1].start_pos.y, 35, 35},(Rectangle){game_res->coin.block_center.x - 15, game_res->coin.block_center.y - 15, 40, 40});
-        	break;
-        }
-        case BLOCK_DOWN:{
-        	
-        	collision_coin = CheckCollisionRecs((Rectangle){game_res->snake.snake_block[game_res->snake.snake_len - 1].start_pos.x - 30, game_res->snake.snake_block[game_res->snake.snake_len - 1].start_pos.y, 35, 35},(Rectangle){game_res->coin.block_center.x - 15, game_res->coin.block_center.y - 15, 40, 40});
-        	break;
-        }
-        case BLOCK_RIGHT:{
-        	
-        	collision_coin = CheckCollisionRecs((Rectangle){game_res->snake.snake_block[game_res->snake.snake_len - 1].end_pos.x, game_res->snake.snake_block[game_res->snake.snake_len - 1].end_pos.y - 15, 35, 35},(Rectangle){game_res->coin.block_center.x - 15, game_res->coin.block_center.y - 15, 40, 40});
-        	break;
-        }
-        case BLOCK_LEFT:{
-        	
-        	collision_coin = CheckCollisionRecs((Rectangle){game_res->snake.snake_block[game_res->snake.snake_len - 1].end_pos.x, game_res->snake.snake_block[game_res->snake.snake_len - 1].end_pos.y - 15, 35, 35},(Rectangle){game_res->coin.block_center.x - 15, game_res->coin.block_center.y - 15, 40, 40});
-        	break;
-       	}
-        
-    }
+	collision_coin = CheckCollisionRecs((Rectangle){game_res->snake.snake_block[game_res->snake.snake_len - 1].end_pos.x, game_res->snake.snake_block[game_res->snake.snake_len - 1].start_pos.y, 30, 30},(Rectangle){game_res->coin.block_center.x - 15, game_res->coin.block_center.y, 30, 30});
+       		
     return collision_coin;
 }
 

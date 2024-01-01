@@ -63,7 +63,7 @@ int main(void)
 	int inital_count = 0;
 	bool collision=false;
 	bool collision_coin = false;
-
+	bool self_collision = false;
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, TITLE);
 	SetTargetFPS(60); 
 	while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -146,7 +146,14 @@ int main(void)
 	    		UnloadImage(game_res.image_map);
 	    		UnloadImageColors(game_res.image_map_colors);
 	    	}
-	    	
+	    	self_collision = check_self_collision(&game_res);
+	    	if(self_collision == true){
+	    		update_frame=30;
+	    		set_snake_intial_position(&game_res);
+	    		delete_all_keypress_node();
+	    		UnloadImage(game_res.image_map);
+	    		UnloadImageColors(game_res.image_map_colors);
+	    	}
 	  	}
     	
 
